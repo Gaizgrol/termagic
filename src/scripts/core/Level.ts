@@ -10,28 +10,35 @@ export default class Level
     private static renderer: WebGLRenderer;
     private static scene: Scene;
     
-    public static events: Dict<any[]> = {
-        'cursor_move': []
-    };
+    public static events: Dict<any> = {};
     public static mainCamera: PerspectiveCamera = null;
     public static timeDilation: number = 1;
+    public static keys: Dict<boolean> = {};
 
-    private static render()
+    private static flushEvents()
+    {
+        Level.events = {
+            'cursor_move': []
+        }
+    }
+
+    public static render()
     {
         Level.renderer.render( Level.scene, Level.mainCamera );
     }
     
     private static update()
     {
-        const dt = ( Level.lastFrame === 0 ) ? 1/60 : Date.now() - Level.lastFrame;
+        const dt = ( Level.lastFrame === 0 ) ? 1/60 : (Date.now() - Level.lastFrame)/1000;
         Level.lastFrame = Date.now();
 
         for ( const obj of Level.objects )
-            obj.update( dt * this.timeDilation );
+            obj.update?.( dt * this.timeDilation );
     }
 
     public static init( renderer: WebGLRenderer, camera: PerspectiveCamera )
     {
+        Level.flushEvents();
         Level.scene = new Scene();
         Level.renderer = renderer;
         Level.mainCamera = camera;
@@ -44,6 +51,8 @@ export default class Level
             Level.objects.push( obj );
             if ( obj.mesh )
                 Level.scene.add( obj.mesh );
+            if ( obj.sprite )
+                Level.scene.add( obj.sprite );
         });
     }
 
@@ -51,6 +60,6 @@ export default class Level
     {
         Level.update();
         Level.render();
-        Level.events['cursor_move'] = [];
+        Level.flushEvents();
     }
 }

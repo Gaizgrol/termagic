@@ -44,5 +44,20 @@ export default class Player implements IBaseEntity
             const { dx } = ev;
             this.rotate( -dx * 0.1 );
         });
+
+        let dir = 0;
+        if ( Level.keys.ArrowUp )
+            dir += 1;
+        if ( Level.keys.ArrowDown )
+            dir -= 1;
+        
+        this.position = this.position.add( this.dir.clone().multiplyScalar(dt*3*dir) );
+
+        let ang = 0;
+        if ( Level.keys.ArrowLeft )
+            ang += 90;
+        if ( Level.keys.ArrowRight )
+            ang -= 90;
+        this.rotate( ang*dt )
     }
 }

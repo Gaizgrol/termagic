@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { PerspectiveCamera, WebGLRenderer } from 'three';
+	import { PerspectiveCamera, TextureLoader, WebGLRenderer } from 'three';
 	import Level from './scripts/core/Level';
+import TexturePool from './scripts/core/TexturePool';
 	import { loadLevel1 } from './scripts/helpers/constants';
 	
 	let container: HTMLDivElement;
@@ -14,9 +15,9 @@
 	window.onresize = () =>
 	{
 		const { innerWidth: iw, innerHeight: ih } = window;
-
 		Level.mainCamera = new PerspectiveCamera( 90, iw/ih, 0.1, 1000 );
 		renderer.setSize( iw, ih );
+		Level.render();
 	}
 
 	window.onmousemove = (ev: MouseEvent) => Level.events['cursor_move'].push({
@@ -25,6 +26,8 @@
 	});
 
 	document.onpointerlockchange = () => { running = !!document.pointerLockElement };
+	document.onkeydown = ev => { Level.keys[ev.key] = true };
+	document.onkeyup = ev => { Level.keys[ev.key] = false };
 
 	canvas.onclick = () =>
 	{
@@ -46,13 +49,21 @@
 		requestAnimationFrame( () => run() );
 	}
 
-	onMount(() =>
+	onMount( async () =>
 	{
+		for ( const img of [ 'afrit', 'brick', 'ceil', 'floor' ] )
+		{
+			const path = `assets/${img}.png`;
+			await TexturePool.load( path );
+			console.log( `Loaded ${path}!` );
+		}
+
 		const { innerWidth: iw, innerHeight: ih } = window;
 		renderer.setSize( iw, ih );
 		Level.init( renderer, new PerspectiveCamera( 90, iw/ih, 0.1, 1000 ));
 		Level.load( loadLevel1() );
 		container.appendChild( canvas );
+		Level.render();
 	});
 </script>
 

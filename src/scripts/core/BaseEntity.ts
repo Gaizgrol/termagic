@@ -1,7 +1,8 @@
-import type { Mesh } from "three";
+import type { Mesh, Sprite } from "three";
 
 export default interface IBaseEntity
 {
     mesh?: Mesh;
-    update( dt: number ): void;
+    sprite?: Sprite;
+    update?( dt: number ): void;
 }
