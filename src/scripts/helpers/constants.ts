@@ -34,12 +34,14 @@ export const loadLevel1 = (): IBaseEntity[] =>
 	const afrit1 = new AnimatedSprite( 'assets/afrit.png', 3, 100, 100, 3, true );
 	const afrit2 = new AnimatedSprite( 'assets/afrit.png', 3, 100, 100, 3, true );
 	const afrit3 = new AnimatedSprite( 'assets/afrit.png', 3, 100, 100, 3, true );
-	afrit1.sprite.position.set( 3, 0, 0 );
-	afrit1.sprite.scale.set( 3, 3, 3 );
-	afrit2.sprite.position.set( 3, 0, 3 );
-	afrit2.sprite.scale.set( 3, 3, 3 );
-	afrit3.sprite.position.set( 1.5, 0, -3.5 );
-	afrit3.sprite.scale.set( 3, 3, 3 );
+	afrit1.mesh.position.set( 3, 0, 0 );
+	afrit1.mesh.scale.set( 3, 3, 3 );
+	afrit2.mesh.position.set( 3, 0, 3 );
+	afrit2.mesh.scale.set( 3, 3, 3 );
+	afrit3.mesh.position.set( 1.5, 0, -3.5 );
+	afrit3.mesh.scale.set( 3, 3, 3 );
 
-    return [ player, wall1, wall2, wall3, wall4, afrit1, afrit2, afrit3, floor, ceil ];
+	const hands = new AnimatedSprite( 'assets/hands.png', 6, 100, 100, 6 );
+
+    return [ player, wall1, wall2, wall3, wall4, afrit1, afrit2, afrit3, floor, ceil, hands ];
 };

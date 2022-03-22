@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { PerspectiveCamera, TextureLoader, WebGLRenderer } from 'three';
 	import Level from './scripts/core/Level';
-import TexturePool from './scripts/core/TexturePool';
+	import TexturePool from './scripts/core/TexturePool';
 	import { loadLevel1 } from './scripts/helpers/constants';
 	
 	let container: HTMLDivElement;
@@ -41,23 +41,15 @@ import TexturePool from './scripts/core/TexturePool';
 
 	const run = () =>
 	{
-		if ( !running )
-			return;
-		
+		if ( !running ) return;
 		Level.run();
-
-		requestAnimationFrame( () => run() );
+		requestAnimationFrame( run );
 	}
 
 	onMount( async () =>
 	{
-		for ( const img of [ 'afrit', 'brick', 'ceil', 'floor' ] )
-		{
-			const path = `assets/${img}.png`;
-			await TexturePool.load( path );
-			console.log( `Loaded ${path}!` );
-		}
-
+		await TexturePool.preload();
+		
 		const { innerWidth: iw, innerHeight: ih } = window;
 		renderer.setSize( iw, ih );
 		Level.init( renderer, new PerspectiveCamera( 90, iw/ih, 0.1, 1000 ));

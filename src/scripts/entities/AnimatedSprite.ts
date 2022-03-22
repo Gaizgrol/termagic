@@ -1,10 +1,12 @@
-import { Sprite, SpriteMaterial } from "three";
+import { Mesh, MeshBasicMaterial, PlaneGeometry, Sprite, SpriteMaterial } from "three";
 import type IBaseEntity from "../core/BaseEntity";
+import Level from "../core/Level";
 import TexturePool from "../core/TexturePool";
 
 export default class AnimatedSprite implements IBaseEntity
 {
-    private material: SpriteMaterial;
+    private geometry: PlaneGeometry;
+    private material: MeshBasicMaterial;
     private nFrames: number;
     private actualFrame: number;
     private frameW: number;
@@ -12,7 +14,7 @@ export default class AnimatedSprite implements IBaseEntity
     private lastUpdate: number;
     
     public framesPerSecond: number;
-    public sprite: Sprite;
+    public mesh: Mesh;
     
     constructor(
         texturePath: string,
@@ -24,8 +26,9 @@ export default class AnimatedSprite implements IBaseEntity
     ) {
         const map = TexturePool.get( texturePath );
 
-        this.material = new SpriteMaterial({ map });
-        this.sprite = new Sprite( this.material );
+        this.geometry = new PlaneGeometry();
+        this.material = new MeshBasicMaterial({ map, transparent: true });
+        this.mesh = new Mesh( this.geometry, this.material );
 
         this.nFrames = nFrames;
         this.frameW = frameW;
@@ -54,7 +57,7 @@ export default class AnimatedSprite implements IBaseEntity
         const h = Math.floor( ih / this.frameH );
 
         const x = i%w;
-        const y = Math.floor( i*w/this.nFrames );
+        const y = Math.floor( i/w );
 
         const uw = 1/w;
         const uh = 1/h;
@@ -62,20 +65,34 @@ export default class AnimatedSprite implements IBaseEntity
         const ux = x*uw;
         const uy = 1-y*uh;
 
-        const uvMapping = this.sprite.geometry.getAttribute('uv');
-        // Vertex order
-        // 3 2
-        // 0 1
+        const uvMapping = this.geometry.getAttribute('uv');
 
-        uvMapping.setXY( 0, ux, uy-uh );
-        uvMapping.setXY( 1, ux+uw, uy-uh );
-        uvMapping.setXY( 2, ux+uw, uy );
-        uvMapping.setXY( 3, ux, uy );
+        if ( this.material.map === TexturePool.get('assets/hands.png') )
+            console.log( i, x, y );
+        
+        //______________________________________//
+        //                  |                   //
+        //  Vertex order    |   UV Mapping      //
+        //                  |                   //
+        //   v0 ---- v1     |  (0,1)----(1,1)   //
+        //    |     / |     |    |     / |      //
+        //    |   /   |     |    |   /   |      //
+        //    | /     |     |    | /     |      //
+        //   v2 ---- v3     |  (0,0)----(1,0)   //
+        //__________________|___________________//
+
+        uvMapping.setXY( 0, ux, uy );
+        uvMapping.setXY( 1, ux+uw, uy );
+        uvMapping.setXY( 2, ux, uy-uh );
+        uvMapping.setXY( 3, ux+uw, uy-uh );
         uvMapping.needsUpdate = true;
     }
 
     public update(): void
     {
+        const camDir = Level.mainCamera.rotation.clone();
+        this.mesh.rotation.set( camDir.x, camDir.y, camDir.z );
+
         const elapsed = Date.now() - this.lastUpdate;
         
         if ( elapsed >= 1000/this.framesPerSecond )

@@ -10,6 +10,16 @@ export default class TexturePool
     private static data: Dict<Texture> = {};
     private static loader = new TextureLoader();
 
+    public static async preload(): Promise<void>
+    {
+        for ( const img of [ 'afrit', 'brick', 'ceil', 'floor', 'hands' ] )
+		{
+			const path = `assets/${img}.png`;
+			await TexturePool.load( path );
+			console.log( `Loaded ${path}!` );
+		}
+    }
+
     public static async load( file: string ): Promise<Texture>
     {
         let tex = TexturePool.data[file];

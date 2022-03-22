@@ -51,8 +51,6 @@ export default class Level
             Level.objects.push( obj );
             if ( obj.mesh )
                 Level.scene.add( obj.mesh );
-            if ( obj.sprite )
-                Level.scene.add( obj.sprite );
         });
     }
 
