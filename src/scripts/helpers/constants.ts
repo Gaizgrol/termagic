@@ -11,16 +11,17 @@ export const UP = new Vector3(0,1,0);
 export const loadLevel1 = (): IBaseEntity[] =>
 {
 	const player = new Player();
-    const wall1 = new Wall(10,5);
-	wall1.mesh.position.set( 0, 1, -5 );
-	const wall2 = new Wall(10,5);
-	wall2.mesh.position.set( 0, 1, 5 );
+
+    const wall1 = new Wall(20,5);
+	wall1.mesh.position.set( 0, 1, -10 );
+	const wall2 = new Wall(20,5);
+	wall2.mesh.position.set( 0, 1, 10 );
 	wall2.mesh.rotateOnAxis( new Vector3( 0, 1, 0 ), 180 * DEGTORAD );
-	const wall3 = new Wall(10,5);
-	wall3.mesh.position.set( 5, 1, 0 );
+	const wall3 = new Wall(20,5);
+	wall3.mesh.position.set( 10, 1, 0 );
 	wall3.mesh.rotateOnAxis( new Vector3( 0, 1, 0 ), -90 * DEGTORAD );
-	const wall4 = new Wall(10,5);
-	wall4.mesh.position.set( -5, 1, 0 );
+	const wall4 = new Wall(20,5);
+	wall4.mesh.position.set( -10, 1, 0 );
 	wall4.mesh.rotateOnAxis( new Vector3( 0, 1, 0 ), 90 * DEGTORAD );
 
 	const floor = new Wall(10,10,'assets/floor.png');
@@ -41,7 +42,5 @@ export const loadLevel1 = (): IBaseEntity[] =>
 	afrit3.mesh.position.set( 1.5, 0, -3.5 );
 	afrit3.mesh.scale.set( 3, 3, 3 );
 
-	const hands = new AnimatedSprite( 'assets/hands.png', 6, 100, 100, 6 );
-
-    return [ player, wall1, wall2, wall3, wall4, afrit1, afrit2, afrit3, floor, ceil, hands ];
+    return [ player, wall1, wall2, wall3, wall4, afrit1, afrit2, afrit3, floor, ceil ];
 };

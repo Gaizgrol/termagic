@@ -11,7 +11,7 @@ export default class AnimatedSprite implements IBaseEntity
     private actualFrame: number;
     private frameW: number;
     private frameH: number;
-    private lastUpdate: number;
+    private timer: number;
     
     public framesPerSecond: number;
     public mesh: Mesh;
@@ -34,11 +34,12 @@ export default class AnimatedSprite implements IBaseEntity
         this.frameW = frameW;
         this.frameH = frameH;
         this.framesPerSecond = framesPerSecond;
+        this.timer = 0;
         
-        this.lastUpdate = Date.now();
         this.actualFrame = shuffle ? Math.floor( Math.random() * nFrames ) : 0;
-        console.log( this.actualFrame );
         this.updateUVs();
+
+        Level.enemies[ this.mesh.uuid ] = this;
     }
 
     private nextFrame()
@@ -66,9 +67,6 @@ export default class AnimatedSprite implements IBaseEntity
         const uy = 1-y*uh;
 
         const uvMapping = this.geometry.getAttribute('uv');
-
-        if ( this.material.map === TexturePool.get('assets/hands.png') )
-            console.log( i, x, y );
         
         //______________________________________//
         //                  |                   //
@@ -88,16 +86,16 @@ export default class AnimatedSprite implements IBaseEntity
         uvMapping.needsUpdate = true;
     }
 
-    public update(): void
+    public update( dt: number ): void
     {
-        const camDir = Level.mainCamera.rotation.clone();
+        const camDir = Level.mainCamera.rotation;
         this.mesh.rotation.set( camDir.x, camDir.y, camDir.z );
 
-        const elapsed = Date.now() - this.lastUpdate;
+        this.timer += dt;
         
-        if ( elapsed >= 1000/this.framesPerSecond )
+        if ( this.timer >= 1/this.framesPerSecond )
         {
-            this.lastUpdate = Date.now();
+            this.timer = 0;
             this.nextFrame();
         }
     }
