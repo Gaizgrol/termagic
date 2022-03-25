@@ -16,6 +16,7 @@ export default class TexturePool
 		{
 			const path = `assets/${img}.png`;
 			await TexturePool.load( path );
+            console.log( `Loaded ${path}` );
 		}
     }
 
@@ -38,7 +39,7 @@ export default class TexturePool
     {
         let tex = TexturePool.data[ file ];
         if ( !tex )
-            throw new Error( 'Texture does not exist!' );
+            throw new Error( `Texture ${file} does not exist!` );
         return tex;
     }
 }

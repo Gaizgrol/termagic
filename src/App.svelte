@@ -3,7 +3,7 @@
 	import { PerspectiveCamera, TextureLoader, WebGLRenderer } from 'three';
 	import Level from './scripts/core/Level';
 	import TexturePool from './scripts/core/TexturePool';
-	import { loadLevel1 } from './scripts/helpers/constants';
+	import { testLevel } from './scripts/levels/all';
 	
 	let container: HTMLDivElement;
 	let gui: HTMLCanvasElement;
@@ -67,7 +67,7 @@
 
 		// Carrega e inicia o nível
 		Level.init( renderer, gui, new PerspectiveCamera( 90, iw/ih, 0.1, 1000 ));
-		Level.load( loadLevel1() );
+		Level.load( testLevel() );
 		container.appendChild( canvas );
 		Level.render();
 	});
