@@ -1,7 +1,8 @@
-import { Mesh, MeshBasicMaterial, PlaneGeometry, Sprite, SpriteMaterial } from "three";
-import type IBaseEntity from "../core/BaseEntity";
+import { Mesh, MeshBasicMaterial, PlaneGeometry, Sprite, SpriteMaterial, Vector2 } from "three";
+import type IBaseEntity from "../core/IBaseEntity";
 import Level from "../core/Level";
 import TexturePool from "../core/TexturePool";
+import SpriteSheetHandler from "../helpers/SpriteSheetHandler";
 
 export default class AnimatedSprite implements IBaseEntity
 {
@@ -9,8 +10,7 @@ export default class AnimatedSprite implements IBaseEntity
     private material: MeshBasicMaterial;
     private nFrames: number;
     private actualFrame: number;
-    private frameW: number;
-    private frameH: number;
+    private imgHandler: SpriteSheetHandler;
     private timer: number;
     
     public framesPerSecond: number;
@@ -29,10 +29,12 @@ export default class AnimatedSprite implements IBaseEntity
         this.geometry = new PlaneGeometry();
         this.material = new MeshBasicMaterial({ map, transparent: true });
         this.mesh = new Mesh( this.geometry, this.material );
-
         this.nFrames = nFrames;
-        this.frameW = frameW;
-        this.frameH = frameH;
+        this.imgHandler = new SpriteSheetHandler(
+            new Vector2( map.image.width, map.image.height ),
+            new Vector2( frameW, frameH ),
+            nFrames
+        );
         this.framesPerSecond = framesPerSecond;
         this.timer = 0;
         
@@ -50,39 +52,10 @@ export default class AnimatedSprite implements IBaseEntity
 
     private updateUVs(): void
     {
-        const { width: iw, height: ih } = this.material.map.image;
-        
-        const i = this.actualFrame;
-
-        const w = Math.floor( iw / this.frameW );
-        const h = Math.floor( ih / this.frameH );
-
-        const x = i%w;
-        const y = Math.floor( i/w );
-
-        const uw = 1/w;
-        const uh = 1/h;
-
-        const ux = x*uw;
-        const uy = 1-y*uh;
-
+        const uvs = this.imgHandler.getUVs( this.actualFrame );
         const uvMapping = this.geometry.getAttribute('uv');
-        
-        //______________________________________//
-        //                  |                   //
-        //  Vertex order    |   UV Mapping      //
-        //                  |                   //
-        //   v0 ---- v1     |  (0,1)----(1,1)   //
-        //    |     / |     |    |     / |      //
-        //    |   /   |     |    |   /   |      //
-        //    | /     |     |    | /     |      //
-        //   v2 ---- v3     |  (0,0)----(1,0)   //
-        //__________________|___________________//
-
-        uvMapping.setXY( 0, ux, uy );
-        uvMapping.setXY( 1, ux+uw, uy );
-        uvMapping.setXY( 2, ux, uy-uh );
-        uvMapping.setXY( 3, ux+uw, uy-uh );
+        for ( let i=0; i<uvMapping.count; i++ )
+            uvMapping.setXY( i, uvs[i].x, uvs[i].y );
         uvMapping.needsUpdate = true;
     }
 

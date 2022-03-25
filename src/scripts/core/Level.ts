@@ -1,8 +1,9 @@
 import { Raycaster, Scene, Vector2 } from 'three';
 import type { PerspectiveCamera, WebGLRenderer } from 'three';
-import type IBaseEntity from './BaseEntity';
+import type IBaseEntity from './IBaseEntity';
 import type { Dict } from './TexturePool';
 import type AnimatedSprite from '../entities/AnimatedSprite';
+import type IDrawable from './IDrawable';
 
 let last = Date.now()
 let t = 0;
@@ -15,20 +16,20 @@ export default class Level
     private static scene: Scene;
     private static ctx: CanvasRenderingContext2D;
     private static caster: Raycaster;
+    private static guiDrawables: IDrawable[] = [];
     
     public static enemies: Dict<AnimatedSprite> = {};
     public static gui: HTMLCanvasElement;
-    public static events: Dict<any> = {
-        'cursor_move': []
-    };
+    public static events: Dict<any[]> = Level.flushEvents();
     public static mainCamera: PerspectiveCamera = null;
     public static timeDilation: number = 1;
     public static keys: Dict<boolean> = {};
 
     private static flushEvents()
     {
-        Level.events = {
-            'cursor_move': []
+        return Level.events = {
+            'cursor_move': [],
+            'key_pressed': []
         }
     }
 
@@ -39,6 +40,8 @@ export default class Level
         // Renderiza a interface 2D
         const { ctx, gui } = Level;
         ctx.clearRect(0, 0, gui.width, gui.height );
+        for ( const obj of Level.guiDrawables )
+            obj.draw();
     }
     
     private static update()
@@ -56,6 +59,7 @@ export default class Level
         Level.scene = new Scene();
         Level.gui = gui;
         Level.ctx = gui.getContext('2d');
+        Level.ctx.imageSmoothingEnabled = false;
         Level.renderer = renderer;
         Level.mainCamera = camera;
         Level.caster = new Raycaster();
@@ -84,5 +88,11 @@ export default class Level
         Level.update();
         Level.render();
         Level.flushEvents();
+    }
+
+    public static registerGUIElement( elem: IDrawable )
+    {
+        elem.setContext( Level.ctx );
+        Level.guiDrawables.push( elem );
     }
 }

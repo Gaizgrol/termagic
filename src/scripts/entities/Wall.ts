@@ -1,6 +1,7 @@
-import { MeshBasicMaterial, Mesh, PlaneGeometry, TextureLoader, RepeatWrapping, NearestFilter, NearestMipMapNearestFilter, DoubleSide, Texture } from 'three';
-import type IBaseEntity from '../core/BaseEntity';
+import { MeshBasicMaterial, Mesh, PlaneGeometry, Vector3 } from 'three';
+import type IBaseEntity from '../core/IBaseEntity';
 import TexturePool from '../core/TexturePool';
+import { AXIS_Y, DEGTORAD } from '../helpers/constants';
 
 export default class Wall implements IBaseEntity
 {
@@ -9,9 +10,14 @@ export default class Wall implements IBaseEntity
 
     public mesh: Mesh;
     
-    constructor( w: number, h: number, texturePath?: string )
+    constructor(
+        w: number, h: number,
+        x: number, y: number, z: number,
+        axis: Vector3 = AXIS_Y,
+        rotation: number = 0,
+        texturePath?: string
+    )
     {
-
         this.plane = new PlaneGeometry( w, h );
         
         const uvMapping = this.plane.getAttribute('uv');
@@ -23,5 +29,7 @@ export default class Wall implements IBaseEntity
         this.material = new MeshBasicMaterial({ map: texturePath ? TexturePool.get( texturePath ) : TexturePool.get('assets/brick.png') });
 
         this.mesh = new Mesh( this.plane, this.material );
+        this.mesh.position.set( x, y, z );
+	    this.mesh.rotateOnAxis( axis, rotation * DEGTORAD );
     }
 }

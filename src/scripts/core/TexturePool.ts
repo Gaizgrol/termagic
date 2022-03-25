@@ -16,7 +16,6 @@ export default class TexturePool
 		{
 			const path = `assets/${img}.png`;
 			await TexturePool.load( path );
-			console.log( `Loaded ${path}!` );
 		}
     }
 
